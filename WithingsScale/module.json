@@ -1,0 +1,16 @@
+{
+    "id": "{4475D5C9-434B-4764-A94A-B2A68623F32A}",
+    "name": "Withings Scale",
+    "type": 3,
+    "vendor": "Withings",
+    "aliases": [
+        "Withings Waage",
+        "Withings Body",
+        "Withings Körperanalyse"
+    ],
+    "url": "https://github.com/cbeham1/SymconWithings/blob/main/WithingsScale/README.md",
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "WTH"
+}

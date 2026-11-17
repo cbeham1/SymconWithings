@@ -1,0 +1,165 @@
+{
+    "elements": [
+        {
+            "type": "ExpansionPanel",
+            "caption": "Withings developer app",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "Label",
+                    "caption": "Create an app at developer.withings.com (Public API integration) and enter the callback URL shown below the settings."
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "ClientID",
+                    "caption": "Client ID",
+                    "width": "500px"
+                },
+                {
+                    "type": "PasswordTextBox",
+                    "name": "ClientSecret",
+                    "caption": "Client secret",
+                    "width": "500px"
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "RedirectURI",
+                    "caption": "Own callback URL (empty = Symcon Connect)",
+                    "width": "500px"
+                }
+            ]
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "UpdateInterval",
+            "caption": "Update interval (0 = only manually or by notification)",
+            "suffix": "minutes",
+            "minimum": 0
+        },
+        {
+            "type": "CheckBox",
+            "name": "UseNotify",
+            "caption": "Withings notifies new measurements immediately (needs Symcon Connect)"
+        },
+        {
+            "type": "CheckBox",
+            "name": "IgnoreAmbiguous",
+            "caption": "Ignore measurements the scale could not assign to this person"
+        },
+        {
+            "type": "CheckBox",
+            "name": "CreateSegments",
+            "caption": "Create segmental values (arms, legs, trunk – Body Scan)"
+        },
+        {
+            "type": "NumberSpinner",
+            "name": "Height",
+            "caption": "Height for the BMI (0 = from Withings)",
+            "suffix": "cm",
+            "digits": 0,
+            "minimum": 0
+        },
+        {
+            "type": "ExpansionPanel",
+            "caption": "Status tile",
+            "items": [
+                {
+                    "type": "CheckBox",
+                    "name": "ShowTile",
+                    "caption": "Create status tile (HTML box for the tile visualization)"
+                },
+                {
+                    "type": "Select",
+                    "name": "TileTheme",
+                    "caption": "Design",
+                    "options": [
+                        {
+                            "caption": "Automatic (light/dark mode of the device)",
+                            "value": 0
+                        },
+                        {
+                            "caption": "Dark",
+                            "value": 1
+                        },
+                        {
+                            "caption": "Light",
+                            "value": 2
+                        }
+                    ]
+                },
+                {
+                    "type": "NumberSpinner",
+                    "name": "TileDays",
+                    "caption": "Period of the weight chart",
+                    "suffix": "days",
+                    "minimum": 7,
+                    "maximum": 365
+                },
+                {
+                    "type": "NumberSpinner",
+                    "name": "TileGoal",
+                    "caption": "Goal weight (0 = none)",
+                    "suffix": "kg",
+                    "digits": 1,
+                    "minimum": 0
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "type": "Button",
+            "caption": "Authorize at Withings",
+            "link": true,
+            "onClick": "echo WTH_GetAuthorizationURL($id);"
+        },
+        {
+            "type": "ExpansionPanel",
+            "caption": "Authorize manually (own callback URL)",
+            "items": [
+                {
+                    "type": "Label",
+                    "caption": "Paste the address Withings redirected to within 30 seconds."
+                },
+                {
+                    "type": "ValidationTextBox",
+                    "name": "Code",
+                    "caption": "Code or redirected address",
+                    "width": "600px"
+                },
+                {
+                    "type": "Button",
+                    "caption": "Complete authorization",
+                    "onClick": "echo WTH_CompleteAuthorization($id, $Code) ? 'OK' : 'Error';"
+                }
+            ]
+        },
+        {
+            "type": "Button",
+            "caption": "Update now",
+            "onClick": "echo WTH_Update($id) ? 'OK' : 'Error';"
+        },
+        {
+            "type": "Button",
+            "caption": "Read measurements again",
+            "onClick": "echo WTH_Reload($id) ? 'OK' : 'Error';"
+        }
+    ],
+    "status": [
+        {
+            "code": 201,
+            "icon": "inactive",
+            "caption": "Client ID and client secret missing"
+        },
+        {
+            "code": 202,
+            "icon": "inactive",
+            "caption": "Authorization at Withings needed"
+        },
+        {
+            "code": 203,
+            "icon": "error",
+            "caption": "Request failed, see debug output"
+        }
+    ]
+}

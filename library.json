@@ -1,0 +1,12 @@
+{
+    "id": "{AA7BA084-87E9-43D3-9F33-A740887E22E9}",
+    "author": "Christian Castillo-Beham",
+    "name": "Withings",
+    "url": "https://github.com/cbeham1/SymconWithings",
+    "compatibility": {
+        "version": "7.0"
+    },
+    "version": "1.0",
+    "build": 1,
+    "date": 0
+}
