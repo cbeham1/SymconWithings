@@ -528,7 +528,7 @@ class WithingsScale extends IPSModule
         }
     }
 
-    /** Status tile: weight with trend, body composition, weight chart of the last days. */
+    /** Status tile: weight with trend, BMI scale, body composition and weight chart; fills the whole tile (container query units). */
     private function TileHTML(array $latest): string
     {
         $e = static fn (string $text): string => htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
@@ -537,15 +537,18 @@ class WithingsScale extends IPSModule
         $value = static fn (string $ident): ?float => isset($latest[$ident]) ? (float) $latest[$ident][1] : null;
         $ok = '#2ecc71';
         $warn = '#f5a623';
+        $bad = '#e74c3c';
         $info = '#4aa3ff';
 
         $weight = $value('Weight');
         $date = isset($latest['Weight']) ? (int) $latest['Weight'][0] : 0;
         $days = max(7, $this->ReadPropertyInteger('TileDays'));
+        $goal = $this->ReadPropertyFloat('TileGoal');
         $history = json_decode($this->ReadAttributeString('History'), true) ?: [];
-        $points = array_values(array_filter($history, static fn (array $p): bool => $p[0] >= time() - $days * 86400));
+        $t0 = time() - $days * 86400;
+        $points = array_values(array_filter($history, static fn (array $p): bool => $p[0] >= $t0));
 
-        // Measurement time
+        // Measurement time, older than 7 days = warning color
         if ($date <= 0) {
             $when = '–';
         } elseif (date('Ymd', $date) === date('Ymd')) {
@@ -553,110 +556,160 @@ class WithingsScale extends IPSModule
         } elseif (date('Ymd', $date) === date('Ymd', strtotime('-1 day'))) {
             $when = $this->Translate('Yesterday') . ' ' . date('H:i', $date);
         } else {
-            $when = date('d.m.Y H:i', $date);
+            $when = date('d.m. H:i', $date);
         }
         $old = $date > 0 && $date < time() - 7 * 86400;
+        $accent = $weight === null || $old ? $warn : $info;
 
-        // Changes: since the previous measurement and within the period
-        $sub = [];
+        // Trend badge (since the last measurement); green = towards the goal (or down without goal)
+        $badge = '';
         $count = count($history);
         if ($weight !== null && $count >= 2) {
             $diff = $weight - (float) $history[$count - 2][1];
-            $sub[] = $this->Signed($diff, $num) . ' kg ' . $this->Translate('since last');
+            $good = $goal > 0 ? abs($weight - $goal) < abs((float) $history[$count - 2][1] - $goal) : $diff < 0;
+            $bc = abs($diff) < 0.05 ? 'var(--sub)' : ($good ? $ok : $warn);
+            $arrow = abs($diff) < 0.05 ? '→' : ($diff < 0 ? '↘' : '↗');
+            $badge = '<span class="wb" style="color:' . $bc . ';border-color:' . $bc . '">' . $arrow . ' ' . $e($this->Signed($diff, $num)) . ' kg</span>';
         }
+        $sub = [];
         if ($weight !== null && count($points) >= 2) {
-            $diff = $weight - (float) $points[0][1];
-            $sub[] = $this->Signed($diff, $num) . ' kg ' . sprintf($this->Translate('in %d days'), $days);
+            $sub[] = $this->Signed($weight - (float) $points[0][1], $num) . ' kg ' . sprintf($this->Translate('in %d days'), $days);
         }
-        $goal = $this->ReadPropertyFloat('TileGoal');
         if ($weight !== null && $goal > 0) {
             $rest = $weight - $goal;
             $sub[] = abs($rest) < 0.05 ? $this->Translate('Goal reached') : sprintf($this->Translate('%s kg to goal'), $num(abs($rest), 1));
         }
 
+        // BMI scale 15–35 with the WHO ranges
+        $bmiHTML = '';
+        $bmi = $value('BMI');
+        if ($bmi !== null) {
+            $categories = [[18.5, 'Underweight', $info], [25, 'Normal', $ok], [30, 'Overweight', $warn], [99, 'Obese', $bad]];
+            foreach ($categories as [$limit, $caption, $color]) {
+                if ($bmi < $limit) {
+                    break;
+                }
+            }
+            $pos = max(0, min(100, ($bmi - 15) / 20 * 100));
+            $bmiHTML = '<div class="wbmi"><div class="wbt"><span>BMI <b>' . $e($num($bmi, 1)) . '</b></span><span style="color:' . $color . '">'
+                . $e($this->Translate($caption)) . '</span></div>'
+                . '<div class="wbs"><i style="left:' . round($pos, 1) . '%"></i></div></div>';
+        }
+
         // Body composition
         $stats = [];
-        $add = function (string $ident, string $caption, int $digits, string $unit) use (&$stats, $value, $num): void
+        $add = function (string $ident, string $caption, int $digits, string $unit, string $color) use (&$stats, $value, $num): void
         {
             $v = $value($ident);
             if ($v !== null) {
-                $stats[] = [$this->Translate($caption), $num($v, $digits) . $unit];
+                $stats[] = [$this->Translate($caption), $num($v, $digits) . $unit, $color];
             }
         };
-        $add('BMI', 'BMI', 1, '');
-        $add('FatRatio', 'Body fat', 1, ' %');
-        $add('MuscleMass', 'Muscle', 1, ' kg');
-        $add('HydrationRatio', 'Water', 1, ' %');
-        $add('BoneMass', 'Bones', 1, ' kg');
-        $add('VisceralFat', 'Visceral fat', 0, '');
-        $add('HeartRate', 'Pulse', 0, ' bpm');
-        $add('MetabolicAge', 'Metabolic age', 0, '');
-        $stats = array_slice($stats, 0, 6);
+        $add('FatRatio', 'Body fat', 1, ' %', '#f5a623');
+        $add('MuscleMass', 'Muscle', 1, ' kg', '#e74c3c');
+        $add('HydrationRatio', 'Water', 1, ' %', '#4aa3ff');
+        $add('BoneMass', 'Bones', 1, ' kg', '#b0b8c1');
+        $add('VisceralFat', 'Visceral fat', 0, '', '#c38bff');
+        $add('HeartRate', 'Pulse', 0, ' bpm', '#ff6b8b');
+        $add('MetabolicAge', 'Metabolic age', 0, '', '#2ecc71');
         $grid = '';
-        foreach ($stats as [$caption, $text]) {
-            $grid .= '<div class="wv"><span>' . $e($caption) . '</span><b>' . $e($text) . '</b></div>';
+        foreach (array_slice($stats, 0, 6) as [$caption, $text, $color]) {
+            $grid .= '<div class="wv" style="border-color:' . $color . '"><span>' . $e($caption) . '</span><b>' . $e($text) . '</b></div>';
         }
 
-        // Weight chart
+        // Weight chart: area + line scale with the tile, points and labels stay round (non-scaling strokes)
         $chart = '';
-        if (count($points) >= 2) {
+        if (count($points) >= 1) {
             $weights = array_map(static fn (array $p): float => (float) $p[1], $points);
             $min = min($weights);
             $max = max($weights);
-            if ($goal > 0 && $goal >= $min - 3 && $goal <= $max + 3) {
+            $showGoal = $goal > 0 && $goal >= $min - 3 && $goal <= $max + 3;
+            if ($showGoal) {
                 $min = min($min, $goal);
                 $max = max($max, $goal);
             }
-            $range = max(0.5, $max - $min);
-            $t0 = time() - $days * 86400;
-            $x = static fn (int $t): float => round(($t - $t0) / ($days * 86400) * 300, 1);
-            $y = static fn (float $w): float => round(56 - ($w - $min) / $range * 50, 1);
+            $pad = max(0.3, ($max - $min) * 0.15);
+            $min -= $pad;
+            $max += $pad;
+            $x = static fn (int $t): float => round(max(0, min(1000, ($t - $t0) / ($days * 86400) * 1000)), 1);
+            $y = static fn (float $w): float => round(100 - ($w - $min) / ($max - $min) * 100, 2);
             $line = '';
+            $dots = '';
             foreach ($points as $p) {
-                $line .= $x((int) $p[0]) . ',' . $y((float) $p[1]) . ' ';
+                $line .= ($line === '' ? 'M' : 'L') . $x((int) $p[0]) . ' ' . $y((float) $p[1]);
+                $dots .= 'M' . $x((int) $p[0]) . ' ' . $y((float) $p[1]) . 'h0';
             }
-            $goalLine = $goal > 0 && $goal >= $min && $goal <= $max
-                ? '<line x1="0" x2="300" y1="' . $y($goal) . '" y2="' . $y($goal) . '" stroke="' . $ok . '" stroke-dasharray="4 4" stroke-width="1" vector-effect="non-scaling-stroke"/>'
-                : '';
+            $first = $points[0];
             $last = $points[count($points) - 1];
-            $chart = '<div class="wc"><svg viewBox="0 0 300 60" preserveAspectRatio="none">' . $goalLine
-                . '<polyline points="' . trim($line) . '" fill="none" stroke="' . $info . '" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'
-                . '<circle cx="' . $x((int) $last[0]) . '" cy="' . $y((float) $last[1]) . '" r="3" fill="' . $info . '"/></svg>'
-                . '<div class="wl"><span>' . $e(sprintf($this->Translate('%d days'), $days)) . '</span><span>' . $e($num(min($weights), 1) . ' – ' . $num(max($weights), 1) . ' kg') . '</span></div></div>';
+            $area = $line . 'L' . $x((int) $last[0]) . ' 100L' . $x((int) $first[0]) . ' 100Z';
+            $goalLine = $showGoal
+                ? '<path d="M0 ' . $y($goal) . 'H1000" stroke="' . $ok . '" stroke-width="1.5" stroke-dasharray="5 5" vector-effect="non-scaling-stroke"/>'
+                : '';
+            $grid3 = '';
+            for ($i = 1; $i < 4; $i++) {
+                $grid3 .= 'M0 ' . ($i * 25) . 'H1000';
+            }
+            $chart = '<div class="wc"><div class="wct"><span>' . $e(sprintf($this->Translate('Weight %d days'), $days)) . '</span>'
+                . '<span>' . $e($num(min($weights), 1) . ' – ' . $num(max($weights), 1) . ' kg') . '</span></div>'
+                . '<svg viewBox="0 0 1000 100" preserveAspectRatio="none"><defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">'
+                . '<stop offset="0" stop-color="' . $info . '" stop-opacity=".45"/><stop offset="1" stop-color="' . $info . '" stop-opacity="0"/></linearGradient></defs>'
+                . '<path d="' . $grid3 . '" stroke="var(--grid)" stroke-width="1" vector-effect="non-scaling-stroke"/>'
+                . $goalLine
+                . (count($points) >= 2 ? '<path d="' . $area . '" fill="url(#wg)"/>'
+                    . '<path d="' . $line . '" fill="none" stroke="' . $info . '" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>' : '')
+                . '<path d="' . $dots . '" stroke="' . $info . '" stroke-width="7" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'
+                . '<path d="M' . $x((int) $last[0]) . ' ' . $y((float) $last[1]) . 'h0" stroke="var(--bg)" stroke-width="4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'
+                . '</svg><div class="wcl"><span>' . date('d.m.', $t0) . '</span>'
+                . ($showGoal ? '<span style="color:' . $ok . '">- - ' . $e($this->Translate('Goal')) . ' ' . $e($num($goal, 1)) . ' kg</span>' : '')
+                . '<span>' . $e($this->Translate('Today')) . '</span></div></div>';
         }
 
-        $color = $weight === null ? $warn : ($old ? $warn : $info);
-        $dark = '--fg:#e9eef3;--name:#c9d2db;--sub:#9aa5b1;--box:rgba(255,255,255,.06)';
-        $light = '--fg:#1f2933;--name:#3e4a56;--sub:#5b6672;--box:rgba(0,0,0,.05)';
+        // Scale icon
+        $icon = '<svg class="wi" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="4"/><path d="M8.5 10a4.5 4.5 0 0 1 7 0"/><path d="M12 10.5l1.2-1.6"/></svg>';
+
+        $dark = '--fg:#eef2f6;--name:#d3dae1;--sub:#97a3af;--box:rgba(255,255,255,.055);--grid:rgba(255,255,255,.07);--bg:#1d2329;--card:linear-gradient(160deg,#232a31,#1a1f25)';
+        $light = '--fg:#1f2933;--name:#3e4a56;--sub:#66717d;--box:rgba(0,0,0,.045);--grid:rgba(0,0,0,.07);--bg:#ffffff;--card:linear-gradient(160deg,#ffffff,#f1f4f8)';
         $theme = $this->ReadPropertyInteger('TileTheme');
         $vars = '.ww{' . ($theme === 2 ? $light : $dark) . '}';
         if ($theme === 0) {
             $vars .= '@media (prefers-color-scheme: light){.ww{' . $light . '}}';
         }
         $css = '<style>'
-            . 'html,body{margin:0;height:100%;background:transparent;font-family:"Segoe UI",Arial,sans-serif}'
-            . '.ww{height:100%;min-height:240px;box-sizing:border-box;padding:12px 14px;border:1px solid ' . $color . '66;border-radius:12px;background:' . $color . '12;color:var(--fg);display:flex;flex-direction:column;gap:8px}'
-            . '.wh{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--name)}'
-            . '.wh b{font-size:17px}'
-            . '.wt{color:' . ($old ? $warn : 'var(--sub)') . '}'
-            . '.wn{text-align:center;font-size:38px;font-weight:bold;line-height:1.1;color:' . $color . '}'
-            . '.wn small{font-size:18px;margin-left:4px}'
-            . '.wu{text-align:center;font-size:13px;color:var(--sub);min-height:16px}'
-            . '.wg{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px}'
-            . '.wv{background:var(--box);border-radius:8px;padding:5px 8px;display:flex;flex-direction:column}'
-            . '.wv span{font-size:11px;color:var(--sub)}.wv b{font-size:15px}'
-            . '.wc{margin-top:auto}.wc svg{width:100%;height:60px;display:block}'
-            . '.wl{display:flex;justify-content:space-between;font-size:11px;color:var(--sub)}'
+            . 'html,body{margin:0;height:100%;background:transparent;font-family:"Segoe UI",Arial,sans-serif;overflow:hidden}'
+            . '.ww{height:100%;min-height:260px;box-sizing:border-box;container-type:size;border:1px solid ' . $accent . '55;border-top:3px solid ' . $accent . ';border-radius:12px;background:var(--card);color:var(--fg);overflow:hidden}'
+            . '.ww *{box-sizing:border-box}'
+            . '.wx{height:100%;display:flex;flex-direction:column;gap:clamp(6px,2.2cqh,14px);padding:clamp(10px,3cqh,18px) clamp(12px,4cqw,20px)}'
+            . '.wh{display:flex;justify-content:space-between;align-items:center;gap:8px}'
+            . '.wh b{display:flex;align-items:center;gap:8px;font-size:clamp(15px,5cqw,19px);color:var(--name)}'
+            . '.wi{width:clamp(20px,6cqw,26px);height:auto;fill:none;stroke:' . $accent . ';stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}'
+            . '.wt{font-size:clamp(11px,3.4cqw,13px);color:' . ($old ? $warn : 'var(--sub)') . ';white-space:nowrap}'
+            . '.wn{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}'
+            . '.wn strong{font-size:clamp(34px,min(17cqw,13cqh),76px);font-weight:700;line-height:1;color:' . $accent . ';letter-spacing:-1px}'
+            . '.wn strong small{font-size:.4em;margin-left:4px;font-weight:600;letter-spacing:0}'
+            . '.wb{font-size:clamp(12px,3.8cqw,15px);font-weight:600;border:1px solid;border-radius:20px;padding:3px 10px;white-space:nowrap}'
+            . '.wu{text-align:center;font-size:clamp(11px,3.4cqw,14px);color:var(--sub);margin-top:-4px}'
+            . '.wbmi{display:flex;flex-direction:column;gap:5px}'
+            . '.wbt{display:flex;justify-content:space-between;font-size:clamp(12px,3.6cqw,14px);color:var(--sub)}.wbt b{color:var(--fg)}.wbt span:last-child{font-weight:600}'
+            . '.wbs{position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg,' . $info . ' 0 17.5%,' . $ok . ' 17.5% 50%,' . $warn . ' 50% 75%,' . $bad . ' 75%);opacity:.9}'
+            . '.wbs i{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--fg);border:3px solid var(--bg);box-shadow:0 0 0 1px var(--fg)}'
+            . '.wg{display:grid;grid-template-columns:repeat(auto-fit,minmax(clamp(78px,28cqw,120px),1fr));gap:clamp(5px,1.6cqh,10px)}'
+            . '.wv{background:var(--box);border-left:3px solid;border-radius:8px;padding:clamp(4px,1.4cqh,9px) 10px;display:flex;flex-direction:column;min-width:0}'
+            . '.wv span{font-size:clamp(10px,3cqw,12px);color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
+            . '.wv b{font-size:clamp(14px,4.6cqw,19px);white-space:nowrap}'
+            . '.wc{flex:1;min-height:70px;display:flex;flex-direction:column;gap:4px}'
+            . '.wc svg{flex:1;width:100%;min-height:40px;display:block;overflow:visible}'
+            . '.wct,.wcl{display:flex;justify-content:space-between;font-size:clamp(10px,3cqw,12px);color:var(--sub)}'
             . $vars
             . '</style>';
 
-        return $css . '<div class="ww">'
-            . '<div class="wh"><b>' . $e($this->GetPersonName()) . '</b><span class="wt">' . $e($when) . '</span></div>'
-            . '<div class="wn">' . ($weight === null ? '–' : $e($num($weight, 1)) . '<small>kg</small>') . '</div>'
-            . '<div class="wu">' . $e(implode(' · ', $sub)) . '</div>'
+        return $css . '<div class="ww"><div class="wx">'
+            . '<div class="wh"><b>' . $icon . $e($this->GetPersonName()) . '</b><span class="wt">' . $e($when) . '</span></div>'
+            . '<div class="wn"><strong>' . ($weight === null ? '–' : $e($num($weight, 1)) . '<small>kg</small>') . '</strong>' . $badge . '</div>'
+            . ($sub !== [] ? '<div class="wu">' . $e(implode(' · ', $sub)) . '</div>' : '')
+            . $bmiHTML
             . ($grid !== '' ? '<div class="wg">' . $grid . '</div>' : '')
             . $chart
-            . '</div>';
+            . '</div></div>';
     }
 
     private function Signed(float $value, callable $num): string

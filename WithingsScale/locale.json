@@ -75,7 +75,13 @@
             "Muscle": "Muskeln",
             "Water": "Wasser",
             "Bones": "Knochen",
-            "Pulse": "Puls"
+            "Pulse": "Puls",
+            "Underweight": "Untergewicht",
+            "Normal": "Normalgewicht",
+            "Overweight": "Übergewicht",
+            "Obese": "Adipositas",
+            "Goal": "Ziel",
+            "Weight %d days": "Gewicht %d Tage"
         }
     }
 }
