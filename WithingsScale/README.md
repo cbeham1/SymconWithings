@@ -1,6 +1,6 @@
 # Withings Scale
 
-[Deutsche Anleitung](README.de.md)
+[Deutsche Anleitung](README.de.md) · [Withings-Entwickler-App Schritt für Schritt (Deutsch)](ENTWICKLER-APP.md)
 
 Reads the body measurements of Withings scales (Body, Body+, Body Smart, Body Comp, Body Scan, …) through the Withings Health API.
 One instance per Withings account (person).

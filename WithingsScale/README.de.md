@@ -56,6 +56,9 @@ Tipp: Die Instanz „Withings <Name>“ nennen, z. B. „Withings Christian“ �
 
 ### 5. Einrichtung der Withings-App und Autorisierung
 
+**Ausführliche Schritt-für-Schritt-Anleitung mit allen Feldern des Entwicklerportals, mehreren Personen, Betrieb ohne
+Connect und Fehlersuche: [ENTWICKLER-APP.md](ENTWICKLER-APP.md).** Kurzfassung:
+
 1. Auf [developer.withings.com](https://developer.withings.com) anmelden und eine Anwendung anlegen
    (**Public API integration**). Name und Beschreibung frei wählbar.
 2. Client-ID und Client-Secret der App in die Instanz eintragen und **Übernehmen** klicken.

@@ -18,7 +18,8 @@ IP-Symcon-Modul für Withings-Waagen (Body, Body+, Body Smart, Body Comp, Body S
 4. Die im Formular angezeigte Callback-URL in der Withings-App eintragen.
 5. **Bei Withings autorisieren** klicken und den Zugriff erlauben.
 
-Details siehe [Anleitung des Moduls](WithingsScale/README.de.md).
+Details siehe [Anleitung des Moduls](WithingsScale/README.de.md) und die ausführliche
+[Anleitung zur Withings-Entwickler-App](WithingsScale/ENTWICKLER-APP.md).
 
 ## Lizenz
 
