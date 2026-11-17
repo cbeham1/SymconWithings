@@ -159,8 +159,13 @@ class WithingsScale extends IPSModule
             ['type' => 'Label', 'caption' => $authorized
                 ? sprintf($this->Translate('Authorized (Withings user %s)'), $this->ReadAttributeString('UserID'))
                 : $this->Translate('Not authorized yet: save, then click "Authorize at Withings"')],
-            ['type' => 'ValidationTextBox', 'name' => 'CallbackURL', 'width' => '700px', 'caption' => $this->Translate('Callback URL to enter in the Withings developer app'),
-                'value' => $redirect !== '' ? $redirect : $this->Translate('No Symcon Connect URL found, enter an own redirect URL')],
+            [
+                'type'    => 'ValidationTextBox',
+                'name'    => 'CallbackURL',
+                'width'   => '700px',
+                'caption' => $this->Translate('Callback URL to enter in the Withings developer app'),
+                'value'   => $redirect !== '' ? $redirect : $this->Translate('No Symcon Connect URL found, enter an own redirect URL'),
+            ],
         ];
         array_splice($form['actions'], 0, 0, $info);
         return (string) json_encode($form);
@@ -566,7 +571,8 @@ class WithingsScale extends IPSModule
 
         // Body composition
         $stats = [];
-        $add = function (string $ident, string $caption, int $digits, string $unit) use (&$stats, $value, $num): void {
+        $add = function (string $ident, string $caption, int $digits, string $unit) use (&$stats, $value, $num): void
+        {
             $v = $value($ident);
             if ($v !== null) {
                 $stats[] = [$this->Translate($caption), $num($v, $digits) . $unit];
