@@ -1,5 +1,7 @@
 # Withings Scale
 
+[Deutsche Anleitung](README.de.md)
+
 Reads the body measurements of Withings scales (Body, Body+, Body Smart, Body Comp, Body Scan, …) through the Withings Health API.
 One instance per Withings account (person).
 

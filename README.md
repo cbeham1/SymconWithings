@@ -1,5 +1,7 @@
 # SymconWithings
 
+[Deutsche Anleitung](README.de.md)
+
 IP-Symcon module for Withings scales.
 
 | Module | Description |
