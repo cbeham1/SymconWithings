@@ -301,6 +301,11 @@ class WithingsScale extends IPSModule
             echo 'OK';
             return;
         }
+        if ($_GET === [] && $_POST === []) {
+            // Reachability test of the Withings developer dashboard (plain GET/HEAD): answer 200 without any data
+            echo 'OK';
+            return;
+        }
         http_response_code(404);
         echo 'Not found';
     }
