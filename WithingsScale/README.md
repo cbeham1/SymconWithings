@@ -25,7 +25,7 @@ Management console → **Module Store** (basket icon at the top right) → searc
 
 Detailed guide with pictures of all forms: **[DEVELOPER-APP.md](DEVELOPER-APP.md)**.
 
-![Setup at a glance](../docs/ablauf.en.svg)
+![Setup at a glance](../docs/ablauf.en.png)
 
 1. Create the instance "Withings Scale" and apply. The form shows the callback URL (Symcon Connect URL + `/hook/Withings<InstanceID>`).
 2. Create an app at [developer.withings.com](https://developer.withings.com) (Public API integration) and register the callback URL.

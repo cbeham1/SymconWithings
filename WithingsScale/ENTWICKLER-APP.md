@@ -43,7 +43,7 @@ wird dabei nie in Symcon gespeichert – Symcon erhält nur Zugriffs-Tokens, die
 
 ## 3. Reihenfolge im Überblick
 
-![Einrichtung im Überblick](../docs/ablauf.de.svg)
+![Einrichtung im Überblick](../docs/ablauf.de.png)
 
 Wichtig: **Erst die Instanz anlegen, dann die App.** Die Callback-URL enthält die Instanz-ID und ist erst danach bekannt;
 außerdem kann Withings die Adresse erst testen, wenn der WebHook existiert.
@@ -67,7 +67,7 @@ außerdem kann Withings die Adresse erst testen, wenn der WebHook existiert.
 
    So sieht die Instanz aus (Bild schon mit eingetragener App; die Nummern gehören zu den Schritten 4, 7, 8 und 9):
 
-   ![Instanz Withings Scale](../docs/symcon-instanz.de.svg)
+   ![Instanz Withings Scale](../docs/symcon-instanz.de.png)
 
 ## 5. Konto im Entwicklerportal
 
@@ -107,7 +107,7 @@ außerdem kann Withings die Adresse erst testen, wenn der WebHook existiert.
 
 Mit **Done** abschließen.
 
-![Withings-Portal: App anlegen](../docs/portal-app.de.svg)
+![Withings-Portal: App anlegen](../docs/portal-app.de.png)
 
 ### Schritt 3 – Zugangsdaten ablesen
 
@@ -119,7 +119,7 @@ Unter **Overview** erscheint die App mit
 | Secret | wird verdeckt angezeigt; mit **Copy** bzw. dem Auge-Symbol kopieren. **Renew** erzeugt ein neues Secret – danach muss es auch in Symcon neu eingetragen werden |
 | Callback URL | die eingetragene(n) Adresse(n); mit **Edit** änderbar |
 
-![Withings-Portal: Overview mit Client-ID und Secret](../docs/portal-overview.de.svg)
+![Withings-Portal: Overview mit Client-ID und Secret](../docs/portal-overview.de.png)
 
 ## 7. Client-ID und Client-Secret in Symcon eintragen
 

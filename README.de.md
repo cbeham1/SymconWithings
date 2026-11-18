@@ -19,7 +19,7 @@ IP-Symcon-Modul für Withings-Waagen (Body, Body+, Body Smart, Body Comp, Body S
 
 ## Einrichtung im Überblick
 
-![Einrichtung im Überblick](docs/ablauf.de.svg)
+![Einrichtung im Überblick](docs/ablauf.de.png)
 
 ## Schnellstart
 

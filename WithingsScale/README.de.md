@@ -53,14 +53,14 @@ Verwaltungskonsole → **Module Store** (Korb-Symbol oben rechts) → „Withing
 (alternativ Kern Instanzen → Modules (Module Control) → **+** → `https://github.com/cbeham1/SymconWithings`).
 Danach „Instanz hinzufügen“ → **Withings Scale**. Für jede Person (eigenes Withings-Konto) eine eigene Instanz anlegen.
 
-Tipp: Die Instanz „Withings <Name>“ nennen, z. B. „Withings Anna“ – die Kachel zeigt dann „Anna“.
+Tipp: Die Instanz „Withings `<Name>`“ nennen, z. B. „Withings Anna“ – die Kachel zeigt dann „Anna“.
 
 ### 5. Einrichtung der Withings-App und Autorisierung
 
 **Ausführliche Schritt-für-Schritt-Anleitung mit allen Feldern des Entwicklerportals, mehreren Personen, Betrieb ohne
 Connect und Fehlersuche: [ENTWICKLER-APP.md](ENTWICKLER-APP.md).** Kurzfassung:
 
-![Einrichtung im Überblick](../docs/ablauf.de.svg)
+![Einrichtung im Überblick](../docs/ablauf.de.png)
 
 
 1. Instanz anlegen und **Übernehmen** – das Formular zeigt unten die **Callback-URL**, z. B.

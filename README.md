@@ -19,7 +19,7 @@ IP-Symcon module for Withings scales (Body, Body+, Body Smart, Body Comp, Body S
 
 ## Setup at a glance
 
-![Setup at a glance](docs/ablauf.en.svg)
+![Setup at a glance](docs/ablauf.en.png)
 
 ## Quick start
 

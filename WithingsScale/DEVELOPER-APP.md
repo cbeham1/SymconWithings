@@ -43,7 +43,7 @@ Symcon – Symcon only receives access tokens that you can revoke at any time.
 
 ## 3. Order at a glance
 
-![Setup at a glance](../docs/ablauf.en.svg)
+![Setup at a glance](../docs/ablauf.en.png)
 
 Important: **create the instance first, then the app.** The callback URL contains the instance ID and is only known
 afterwards; also Withings can only test the address once the WebHook exists.
@@ -66,7 +66,7 @@ afterwards; also Withings can only test the address once the WebHook exists.
 
    This is what the instance looks like (picture already with the app entered; the numbers belong to steps 4, 7, 8 and 9):
 
-   ![Withings Scale instance](../docs/symcon-instanz.en.svg)
+   ![Withings Scale instance](../docs/symcon-instanz.en.png)
 
 ## 5. Developer portal account
 
@@ -106,7 +106,7 @@ afterwards; also Withings can only test the address once the WebHook exists.
 
 Finish with **Done**.
 
-![Withings portal: create the app](../docs/portal-app.en.svg)
+![Withings portal: create the app](../docs/portal-app.en.png)
 
 ### Step 3 – Read the credentials
 
@@ -118,7 +118,7 @@ Under **Overview** the app is listed with
 | Secret | shown hidden; copy with **Copy** or the eye icon. **Renew** creates a new secret – it must then be entered in Symcon again |
 | Callback URL | the registered address(es); change with **Edit** |
 
-![Withings portal: overview with client ID and secret](../docs/portal-overview.en.svg)
+![Withings portal: overview with client ID and secret](../docs/portal-overview.en.png)
 
 ## 7. Enter client ID and client secret in Symcon
 
