@@ -672,7 +672,7 @@ class WithingsScale extends IPSModule
         $theme = $this->ReadPropertyInteger('TileTheme');
         $vars = '.ww{' . ($theme === 2 ? $light : $dark) . '}';
         if ($theme === 0) {
-            $vars .= '@media (prefers-color-scheme: light){.ww{' . $light . '}}';
+            $vars .= '@media (prefers-color-scheme: light){.ww:not(.vd){' . $light . '}}.ww.vl{' . $light . '}';
         }
         $css = '<style>'
             . 'html,body{margin:0;height:100%;background:transparent;font-family:"Segoe UI",Arial,sans-serif;overflow:hidden}'
@@ -709,7 +709,18 @@ class WithingsScale extends IPSModule
             . $bmiHTML
             . ($grid !== '' ? '<div class="wg">' . $grid . '</div>' : '')
             . $chart
-            . '</div></div>';
+            . '</div></div>'
+            . ($theme === 0 ? $this->ThemeScript('ww') : '');
+    }
+
+    /** Automatic design: follows the card/text colors that the tile visualization passes to HTML content, otherwise prefers-color-scheme. */
+    private function ThemeScript(string $class): string
+    {
+        return '<script>(function(){var s=getComputedStyle(document.documentElement);'
+            . 'function l(n){var v=s.getPropertyValue(n).replace(/[^0-9a-f]/gi,"");if(v.length<6){return -1;}'
+            . 'v=v.length===8&&/^ff/i.test(v)?v.slice(2):v.slice(0,6);var c=parseInt(v,16);return 0.299*(c>>16)+0.587*(c>>8&255)+0.114*(c&255);}'
+            . 'var b=l("--card-color"),f=l("--content-color");if(b<0){return;}'
+            . 'document.querySelectorAll(".' . $class . '").forEach(function(e){e.classList.add(b<(f<0?128:f)?"vd":"vl");});})();</script>';
     }
 
     private function Signed(float $value, callable $num): string

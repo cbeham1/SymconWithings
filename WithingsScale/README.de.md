@@ -88,7 +88,7 @@ Für jede Integration eine eigene App bzw. eigene Autorisierung verwenden.
 | Segmentwerte anlegen | Arme, Beine, Rumpf (nur Body Scan) |
 | Körpergröße für den BMI | in cm; 0 = Größe aus Withings |
 | Statuskachel anlegen | Variable „Statuskachel“ (HTML-Box), Standard an |
-| Design | Automatisch (Hell/Dunkel des Geräts), Dunkel, Hell |
+| Design | Automatisch (Design der Kachel-Visualisierung, sonst Hell/Dunkel des Geräts), Dunkel, Hell |
 | Zeitraum des Gewichtsverlaufs | 7–365 Tage (Standard 30) |
 | Zielgewicht | in kg; 0 = keines |
 | Bei Withings autorisieren | öffnet die Anmeldeseite von Withings |
