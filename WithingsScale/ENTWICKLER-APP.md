@@ -3,7 +3,10 @@
 Diese Anleitung beschreibt ausführlich, wie die für das Modul **Withings Scale** nötige App im Withings-Entwicklerportal
 angelegt und mit IP-Symcon verbunden wird.
 
-[Zurück zur Modul-Anleitung](README.de.md)
+[Zurück zur Modul-Anleitung](README.de.md) · [English version](DEVELOPER-APP.md)
+
+> Die Bilder sind Schemabilder: Sie zeigen Felder und Reihenfolge, das Aussehen im Original weicht etwas ab.
+> Client-ID, Secret und Adressen darin sind Beispiele.
 
 ## Inhaltsverzeichnis
 
@@ -40,23 +43,19 @@ wird dabei nie in Symcon gespeichert – Symcon erhält nur Zugriffs-Tokens, die
 
 ## 3. Reihenfolge im Überblick
 
-```
-Symcon: Modul installieren ─► Instanz anlegen ─► Callback-URL steht im Formular
-                                                          │
-Withings-Portal: App anlegen ◄── Callback-URL eintragen ◄─┘
-        │
-        └─► Client-ID + Client-Secret ─► Symcon: eintragen, übernehmen ─► „Bei Withings autorisieren“
-```
+![Einrichtung im Überblick](../docs/ablauf.de.svg)
 
 Wichtig: **Erst die Instanz anlegen, dann die App.** Die Callback-URL enthält die Instanz-ID und ist erst danach bekannt;
 außerdem kann Withings die Adresse erst testen, wenn der WebHook existiert.
 
 ## 4. Modul installieren und Instanz anlegen
 
-1. Symcon-Konsole → Kern Instanzen → **Modules** (Module Control) → **+** → `https://github.com/cbeham1/SymconWithings`.
+1. Verwaltungskonsole → **Module Store** (Korb-Symbol oben rechts) → „Withings Scale“ suchen → **Installieren**.
+   (Alternativ Kern Instanzen → Modules (Module Control) → **+** → `https://github.com/cbeham1/SymconWithings` –
+   nicht beides gleichzeitig.)
 2. Objektbaum → **Instanz hinzufügen** → „Withings“ suchen → **Withings Scale** (auch unter „Withings Waage“,
    „Withings Body“, „Withings Körperanalyse“ zu finden – alles dasselbe Modul).
-3. Name z. B. `Withings Christian` (die Kachel zeigt dann „Christian“) → **OK**.
+3. Name z. B. `Withings Anna` (die Kachel zeigt dann „Anna“) → **OK**.
 4. Im Formular steht unten die **Callback-URL**, z. B.
 
    ```
@@ -64,11 +63,18 @@ außerdem kann Withings die Adresse erst testen, wenn der WebHook existiert.
    ```
 
    Der Status „Client-ID und Client-Secret fehlen“ (rotes Symbol) ist zu diesem Zeitpunkt normal.
+   Falls die Callback-URL fehlt: einmal **Übernehmen** klicken und das Formular neu öffnen.
+
+   So sieht die Instanz aus (Bild schon mit eingetragener App; die Nummern gehören zu den Schritten 4, 7, 8 und 9):
+
+   ![Instanz Withings Scale](../docs/symcon-instanz.de.svg)
 
 ## 5. Konto im Entwicklerportal
 
-1. [developer.withings.com](https://developer.withings.com) öffnen → **Developer Dashboard** → registrieren bzw. anmelden.
-2. Bei der ersten Anmeldung fragt Withings nach einer Organisation (Name frei wählbar, z. B. „Symcon Zuhause“).
+1. [developer.withings.com](https://developer.withings.com) öffnen → **Developer Dashboard** → **Sign up** (neues Konto)
+   bzw. **Log in**. Das Entwicklerkonto ist unabhängig vom normalen Withings-Konto; dieselbe E-Mail-Adresse ist erlaubt.
+2. Bei der ersten Anmeldung fragt Withings nach einer **Organisation** (Name frei wählbar, z. B. „Symcon Zuhause“;
+   bei privater Nutzung genügt der eigene Name).
 3. Oben links muss **Withings Public Cloud** gewählt sein.
 
 ## 6. App anlegen
@@ -101,6 +107,8 @@ außerdem kann Withings die Adresse erst testen, wenn der WebHook existiert.
 
 Mit **Done** abschließen.
 
+![Withings-Portal: App anlegen](../docs/portal-app.de.svg)
+
 ### Schritt 3 – Zugangsdaten ablesen
 
 Unter **Overview** erscheint die App mit
@@ -110,6 +118,8 @@ Unter **Overview** erscheint die App mit
 | ClientID | lange Zeichenkette – mit **Copy** kopieren |
 | Secret | wird verdeckt angezeigt; mit **Copy** bzw. dem Auge-Symbol kopieren. **Renew** erzeugt ein neues Secret – danach muss es auch in Symcon neu eingetragen werden |
 | Callback URL | die eingetragene(n) Adresse(n); mit **Edit** änderbar |
+
+![Withings-Portal: Overview mit Client-ID und Secret](../docs/portal-overview.de.svg)
 
 ## 7. Client-ID und Client-Secret in Symcon eintragen
 
@@ -190,7 +200,7 @@ Autorisierung, wirft die eine die andere hinaus.
 
 | Meldung / Verhalten | Ursache | Abhilfe |
 | --- | --- | --- |
-| Test im Portal: „Host Unreachable“ | Symcon Connect nicht aktiv, Instanz noch nicht übernommen oder Modul älter als 1.0 build 2 | Connect prüfen, Instanz **Übernehmen**, Modul in Module Control aktualisieren |
+| Test im Portal: „Host Unreachable“ | Symcon Connect nicht aktiv, Instanz noch nicht übernommen oder Modul älter als 1.0 build 2 | Connect prüfen, Instanz **Übernehmen**, Modul im Module Store aktualisieren |
 | Test im Portal: „Too Many Request: rate limit reached“ | zu viele Tests in kurzer Zeit | einige Minuten warten; der Test ist optional – **Done** geht auch so |
 | Withings-Seite: „invalid redirect_uri“ o. ä. | Callback-URL in der App weicht ab | Adresse aus dem Symcon-Formular **zeichengenau** registrieren |
 | „Autorisierung fehlgeschlagen“ | Code abgelaufen (30 s), falsches Secret oder state passt nicht (Seite doppelt geöffnet) | Secret prüfen, erneut „Bei Withings autorisieren“ |

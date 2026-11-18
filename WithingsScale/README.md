@@ -1,6 +1,6 @@
 # Withings Scale
 
-[Deutsche Anleitung](README.de.md) · [Withings-Entwickler-App Schritt für Schritt (Deutsch)](ENTWICKLER-APP.md)
+[Deutsche Anleitung](README.de.md) · **[Developer app step by step](DEVELOPER-APP.md)**
 
 Reads the body measurements of Withings scales (Body, Body+, Body Smart, Body Comp, Body Scan, …) through the Withings Health API.
 One instance per Withings account (person).
@@ -16,12 +16,21 @@ One instance per Withings account (person).
 - Optional push notification of Withings: new measurements arrive within seconds (needs Symcon Connect)
 - Measurements the scale could not assign to the person (e.g. guests) are ignored (configurable)
 
+## Installation
+
+Management console → **Module Store** (basket icon at the top right) → search "Withings Scale" → **Install**
+(or Module Control → **+** → `https://github.com/cbeham1/SymconWithings`, not both).
+
 ## Setup
 
-1. Create an app at [developer.withings.com](https://developer.withings.com) (Public API integration).
-2. Create the instance „Withings Scale“, enter client ID and client secret and apply.
-3. Copy the callback URL shown in the configuration form (Symcon Connect URL + `/hook/Withings<InstanceID>`) to the callback URLs of the Withings app.
-4. Click „Authorize at Withings“, sign in and allow access. The window confirms the authorization.
+Detailed guide with pictures of all forms: **[DEVELOPER-APP.md](DEVELOPER-APP.md)**.
+
+![Setup at a glance](../docs/ablauf.en.svg)
+
+1. Create the instance "Withings Scale" and apply. The form shows the callback URL (Symcon Connect URL + `/hook/Withings<InstanceID>`).
+2. Create an app at [developer.withings.com](https://developer.withings.com) (Public API integration) and register the callback URL.
+3. Enter client ID and client secret of the app in the instance and apply.
+4. Click "Authorize at Withings", sign in and allow access. The window confirms the authorization.
 
 Without Symcon Connect enter an own callback URL that leads to the WebHook, or any registered URL and complete the authorization manually
 (paste the redirected address within 30 seconds – Withings codes expire quickly).

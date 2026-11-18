@@ -49,21 +49,25 @@ Alle Withings-Waagen, deren Messungen in der Withings-App erscheinen. Welche Wer
 
 ### 4. Installation
 
-Kern Instanzen → **Modules** (Module Control) → **+** → `https://github.com/cbeham1/SymconWithings` eintragen.
+Verwaltungskonsole → **Module Store** (Korb-Symbol oben rechts) → „Withings Scale“ suchen → **Installieren**
+(alternativ Kern Instanzen → Modules (Module Control) → **+** → `https://github.com/cbeham1/SymconWithings`).
 Danach „Instanz hinzufügen“ → **Withings Scale**. Für jede Person (eigenes Withings-Konto) eine eigene Instanz anlegen.
 
-Tipp: Die Instanz „Withings <Name>“ nennen, z. B. „Withings Christian“ – die Kachel zeigt dann „Christian“.
+Tipp: Die Instanz „Withings <Name>“ nennen, z. B. „Withings Anna“ – die Kachel zeigt dann „Anna“.
 
 ### 5. Einrichtung der Withings-App und Autorisierung
 
 **Ausführliche Schritt-für-Schritt-Anleitung mit allen Feldern des Entwicklerportals, mehreren Personen, Betrieb ohne
 Connect und Fehlersuche: [ENTWICKLER-APP.md](ENTWICKLER-APP.md).** Kurzfassung:
 
-1. Auf [developer.withings.com](https://developer.withings.com) anmelden und eine Anwendung anlegen
-   (**Public API integration**). Name und Beschreibung frei wählbar.
-2. Client-ID und Client-Secret der App in die Instanz eintragen und **Übernehmen** klicken.
-3. Das Formular zeigt unten die **Callback-URL**, z. B. `https://xxxx.ipmagic.de/hook/Withings12345`.
-   Diese Adresse in der Withings-App unter **Callback URLs** eintragen und speichern.
+![Einrichtung im Überblick](../docs/ablauf.de.svg)
+
+
+1. Instanz anlegen und **Übernehmen** – das Formular zeigt unten die **Callback-URL**, z. B.
+   `https://xxxx.ipmagic.de/hook/Withings12345`.
+2. Auf [developer.withings.com](https://developer.withings.com) anmelden und eine Anwendung anlegen
+   (**Public API integration**, Name und Beschreibung frei wählbar) und die Callback-URL unter **Registered URLs** eintragen.
+3. Client-ID und Client-Secret der App in die Instanz eintragen und **Übernehmen** klicken.
 4. In der Instanz **Bei Withings autorisieren** klicken, mit dem Withings-Konto der Person anmelden und den Zugriff erlauben.
    Es erscheint „Autorisierung erfolgreich“. Die Instanz liest nun die Messungen der letzten Tage (mindestens 30) ein.
 
